@@ -14,6 +14,16 @@ pip3 install pyzmq pynput
 
 ## How to use
 
+Start the indicator tool (and mouse control logic, which is not implemented yet).
+
 ```
 cd virtual_touchpanel
-cd
+python3 vtouch_indicator.py
+```
+
+You can start a dummy publish to act as trt_pose backend.
+
+```
+python3 dummy_trtpose_pub.py
+```
+
