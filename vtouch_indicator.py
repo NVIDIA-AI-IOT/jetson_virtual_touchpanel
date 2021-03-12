@@ -59,12 +59,25 @@ def trtpose_subscriber(running, last_timestamp, framerate):
     # Subscribes to all topics
     socket.subscribe("")
 
+    last_gesture = ""
+    curr_gesture = ""
+
     while True:
 
         # Receives a string format message
-        msg_string = socket.recv_string() 
+        msg = socket.recv_json() 
         cur_timestamp = time.time()
-        print(msg_string + " (received at " + str(cur_timestamp) + ")")
+        curr_gesture = msg['gesture']
+        
+        x = msg['objects'][0]['keypoints'][5]['x']
+        y = msg['objects'][0]['keypoints'][5]['y']
+        #print("[" + str(x) + "," + str(y) + "] (received at " + str(cur_timestamp) + ")")
+        if (x != 0 or y != 0):
+            model.set_mouse_coord((224-x)/224 * 1920, y/224 * 1080)
+            if ( last_gesture == "point" and curr_gesture == "click"):
+                print(" ===========> trigger_mouse_click")
+                model.trigger_mouse_click(1);
+            last_gesture = curr_gesture
 
         if (cur_timestamp % 1.0 < last_timestamp.value % 1.0):
             framerate = frame_number
@@ -106,9 +119,9 @@ def update_icon(status):
 def do_notify(status):
     msg_lines = []
     if(status):
-        msg_lines.append(f"Service 'trt_pose' started")
+        msg_lines.append(f"Service 'Handpose Camera' started")
     else:
-        msg_lines.append(f"Service 'trt_pose' stopped")
+        msg_lines.append(f"Service 'Handpose Camera' stopped")
     msg = '\n'.join(msg_lines)
     notification.update(msg)
     notification.show()
