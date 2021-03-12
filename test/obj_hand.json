@@ -1,0 +1,26 @@
+{
+    "type": "hand",
+    "keypoints": [
+        { "key": "palm"   , "x":0, "y":0 },
+        { "key": "thumb_1", "x":0, "y":0 },
+        { "key": "thumb_2", "x":0, "y":0 },
+        { "key": "thumb_3", "x":0, "y":0 },
+        { "key": "thumb_4", "x":0, "y":0 },
+        { "key": "index_1", "x":0, "y":0 },
+        { "key": "index_2", "x":0, "y":0 },
+        { "key": "index_3", "x":0, "y":0 },
+        { "key": "index_4", "x":0, "y":0 },
+        { "key": "middle_1", "x":0, "y":0 },
+        { "key": "middle_2", "x":0, "y":0 },
+        { "key": "middle_3", "x":0, "y":0 },
+        { "key": "middle_4", "x":0, "y":0 },
+        { "key": "ring_1", "x":0, "y":0 },
+        { "key": "ring_2", "x":0, "y":0 },
+        { "key": "ring_3", "x":0, "y":0 },
+        { "key": "ring_4", "x":0, "y":0 },
+        { "key": "baby_1", "x":0, "y":0 },
+        { "key": "baby_2", "x":0, "y":0 },
+        { "key": "baby_3", "x":0, "y":0 },
+        { "key": "baby_4", "x":0, "y":0 }
+    ]
+}

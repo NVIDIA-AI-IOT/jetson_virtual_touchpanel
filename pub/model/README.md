@@ -1,0 +1,1 @@
+# publisher scripts' model files goes here
