@@ -2,10 +2,10 @@
 
 This tool enables Jetson to be controlled by hand gesture in air using a webcam and [`trt_pose`](https://github.com/NVIDIA-AI-IOT/trt_pose) as a backbone to do the AI handpose recognition.
 
+![](/docs/images/vtouch_trtpose_start_notification.png)
+
 It is primarily desigend for interactive signage systems.<br> 
 By utilizing a camera and AI to understand the users handpose in front of the screen, it enables users to interact with the system without physically touching the touchpanel or ohter input devices like a mouse.
-
-![](/docs/images/vtouch_trtpose_start_notification.png)
 
 ## Dependencies
 

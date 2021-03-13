@@ -53,7 +53,7 @@ def about(self):
     )
     dialog.format_secondary_text(
         "This tool uses a camera to detect users' handpose to control the system mouse cursor. \
-        \nIt is primarily designed for an interactive signage system to free users from physically touching a mouse or a touchpanel. \
+        \nIt is primarily designed for interactive signage systems, freeing users from physically touching a mouse or a touchpanel. \
         \n \
         \nhttps://github.com/NVIDIA-AI-IOT/jetson_virtual_touchpanel"
     )
