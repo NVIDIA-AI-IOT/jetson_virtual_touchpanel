@@ -43,6 +43,39 @@ evt_queue = mp.Queue()
 last_timestamp = mp.Value('d', time.time())
 framerate = mp.Value('i', 0)
 
+def about(self):
+    dialog = gtk.MessageDialog(
+        transient_for=None,
+        flags=0,
+        message_type=gtk.MessageType.INFO,
+        buttons=gtk.ButtonsType.OK,
+        text="Jetson Virtual Touchpanel",
+    )
+    dialog.format_secondary_text(
+        "This tool uses a camera to detect users' handpose to control the system mouse cursor. \
+        \nIt is primarily designed for an interactive signage system to free users from physically touching a mouse or a touchpanel. \
+        \n \
+        \nhttps://github.com/NVIDIA-AI-IOT/jetson_virtual_touchpanel"
+    )
+    dialog.run()
+    print("INFO dialog closed")
+
+    dialog.destroy()
+
+def start(_):
+    cmd = "x-terminal-emulator --title='handpose-camera service' -e \
+        /home/jetson/jetson-pose-container/run.sh \
+        --run python3 ./_host_home/jetson_virtual_touchpanel/pub/trtpose_handpose/pub_hand_msg_profile.py \
+        ".split()
+    subprocess.call(cmd)
+
+def stop(_):
+    cmd = "docker ps -a -q --filter ancestor=jetson-pose:r32.5.0"
+    container_id = subprocess.check_output(cmd, shell=True).decode("utf-8") 
+    print(container_id)
+    cmd = "docker stop " + container_id
+    subprocess.call(cmd.split())
+
 def quit(_):
     running.clear()
     proc_subscriber.terminate()
@@ -51,12 +84,30 @@ def quit(_):
 
 def build_menu():
     menu = gtk.Menu()
+    item_about = gtk.MenuItem('About Virtual Touchpanel ...')
+    item_about.connect('activate', about)
+    menu.append(item_about)
+    
+    menu.append(gtk.SeparatorMenuItem())
+
+    item_start = gtk.MenuItem('Start camera-pose service')
+    item_start.connect('activate', start)
+    menu.append(item_start)
+    item_stop = gtk.MenuItem('Stop camera-pose service')
+    item_stop.connect('activate', stop)
+    menu.append(item_stop)
+    
+    menu.append(gtk.SeparatorMenuItem())
+
     item_quit = gtk.MenuItem('Quit')
     item_quit.connect('activate', quit)
     menu.append(item_quit)
 
     menu.show_all()
     return menu
+
+def mess_callback():
+    pass
 
 def trtpose_subscriber(running, last_timestamp, framerate):
     print("--- Subscriber thread ---")
@@ -133,11 +184,13 @@ def update_icon(status):
 def do_notify(status):
     msg_lines = []
     if(status):
-        msg_lines.append(f"Service 'Handpose Camera' started")
+        msg_lines.append(f"Service 'handpose-camera' started")
     else:
-        msg_lines.append(f"Service 'Handpose Camera' stopped")
+        msg_lines.append(f"Service 'handpose-camera' stopped")
     msg = '\n'.join(msg_lines)
     notification.update(msg)
+    notification.set_timeout(1000) #milliseconds
+    notification.set_urgency(0) 
     notification.show()
 
 model = vt.vtouch()
