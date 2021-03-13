@@ -31,8 +31,8 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 HOST = "0.0.0.0" # Publish to Docker host
 PORT = "5001"
 
-ORG_MODEL = 'hand_pose_resnet18_att_244_244.pth'
-TRT_MODEL = 'hand_pose_resnet18_att_244_244_trt.pth'
+ORG_MODEL = 'handpose_resnet18_att_224x224_nvhand-2k6.pth'
+TRT_MODEL = 'handpose_resnet18_att_224x224_nvhand-2k6_trt.pth'
 
 # Creates a socket instance
 context = zmq.Context()
