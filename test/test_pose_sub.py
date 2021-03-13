@@ -1,3 +1,17 @@
+# Copyright (c) 2020-2021, NVIDIA CORPORATION.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import json
 import zmq
 import time
@@ -7,8 +21,8 @@ import pynput
 from pynput.mouse import Button, Controller
 mouse = Controller()
 
-host = "127.0.0.1"
-port = "5001"
+HOST = "127.0.0.1"
+PORT = "5001"
 
 print("--- Subscriber process ---")
 
@@ -17,7 +31,7 @@ context = zmq.Context()
 socket = context.socket(zmq.SUB)
 
 # Connects to a bound socket
-socket.connect("tcp://{}:{}".format(host, port))
+socket.connect("tcp://{}:{}".format(HOST, PORT))
 
 # Subscribes to all topics
 socket.subscribe("")
@@ -46,5 +60,5 @@ while True:
     y = msg['objects'][0]['keypoints'][5]['y']
 
     #print("[" + str(x) + ", " + str(y) + "]")
-    mouse.position = (x, y)
+    mouse.position = (x/224 * 1920, y/224 * 1080)
     

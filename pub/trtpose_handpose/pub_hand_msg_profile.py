@@ -1,15 +1,25 @@
+# Copyright (c) 2020-2021, NVIDIA CORPORATION.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import json
 import cv2
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg 
 import trt_pose.coco
-import math
 import os
 import numpy as np
+import pickle 
 
-import time_measure_utils
-
-from utils import load_params, load_model, draw_objects, draw_joints, load_image
+import util_time_profiling
 
 import zmq
 import time
@@ -18,25 +28,31 @@ import sys
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-host = "0.0.0.0" # Publish to Docker host
-port = "5001"
+HOST = "0.0.0.0" # Publish to Docker host
+PORT = "5001"
+
+ORG_MODEL = 'hand_pose_resnet18_att_244_244.pth'
+TRT_MODEL = 'hand_pose_resnet18_att_244_244_trt.pth'
 
 # Creates a socket instance
 context = zmq.Context()
 socket = context.socket(zmq.PUB)
 
 # Binds the socket to a predefined port on localhost
-socket.bind("tcp://{}:{}".format(host, port))
+socket.bind("tcp://{}:{}".format(HOST, PORT))
 
-with open('../json/hand_pose.json', 'r') as f:
+# Load json files from local directories
+DIR = os.path.dirname(os.path.abspath(__file__)) + "/"
+
+with open(DIR + '../json/hand_pose.json', 'r') as f:
     logging.info('reading ../json/hand_pose.json ...')
     hand_pose = json.load(f)
 
-with open('../json/msg_pose.json', 'r') as f:
+with open(DIR + '../json/msg_pose.json', 'r') as f:
     logging.info('reading ../json/msg_pose.json ...')
     json_pose = json.load(f)
 
-with open('../json/obj_hand.json', 'r') as f:
+with open(DIR + '../json/obj_hand.json', 'r') as f:
     logging.info('reading ../json/obj_hand.json ...')
     json_hand = json.load(f)
 
@@ -55,19 +71,19 @@ WIDTH = 224
 HEIGHT = 224
 data = torch.zeros((1, 3, HEIGHT, WIDTH)).cuda()
 
-if not os.path.exists('../model/hand_pose_resnet18_att_244_244_trt.pth'):
-    logging.info('Did not find: model/hand_pose_resnet18_att_244_244_trt.pth')
-    MODEL_WEIGHTS = '../model/hand_pose_resnet18_att_244_244.pth'
-    logging.info('Loading     : ../model/hand_pose_resnet18_att_244_244.pth')
+if not os.path.exists(DIR + '../model/' + TRT_MODEL):
+    logging.info('Did not find: model/' + TRT_MODEL)
+    MODEL_WEIGHTS = DIR + '../model/' + ORG_MODEL
+    logging.info('Loading     : ../model/' + TRT_MODEL)
     model.load_state_dict(torch.load(MODEL_WEIGHTS))
     logging.debug('import torch2trt')
     import torch2trt
-    logging.info('Building    : ../model/hand_pose_resnet18_att_244_244_trt.pth')
+    logging.info('Building    : ../model/' + TRT_MODEL)
     model_trt = torch2trt.torch2trt(model, [data], fp16_mode=True, max_workspace_size=1<<25)
-    OPTIMIZED_MODEL = '../model/hand_pose_resnet18_att_244_244_trt.pth'
+    OPTIMIZED_MODEL = DIR + '../model/' + TRT_MODEL
     torch.save(model_trt.state_dict(), OPTIMIZED_MODEL)
 
-OPTIMIZED_MODEL = '../model/hand_pose_resnet18_att_244_244_trt.pth'
+OPTIMIZED_MODEL = DIR + '../model/' + TRT_MODEL
 logging.debug('from torch2trt import TRTModule')
 from torch2trt import TRTModule
 
@@ -97,15 +113,23 @@ preprocessdata = preprocessdata(topology, num_parts)
 from gesture_classifier import gesture_classifier
 gesture_classifier = gesture_classifier()
 
+filename = DIR + '../model/svmmodel_5class.sav'
+clf = pickle.load(open(filename, 'rb'))
+with open(DIR + '../json/gesture.json', 'r') as f:
+    gesture = json.load(f)
+gesture_type = gesture["classes"]
+
 from jetcam.usb_camera import USBCamera
 #from jetcam.csi_camera import CSICamera
 from jetcam.utils import bgr8_to_jpeg
 
+# TODO: Automatically find YUYV supported camera device ($ v4l2-ctl --device /dev/video* --list-formats)
 camera = USBCamera(width=WIDTH, height=HEIGHT, capture_fps=30, capture_device=0)
+# TODO: Support CSI camera and pick appropriate camera based on given argument
+#camera = CSICamera(width=WIDTH, height=HEIGHT, capture_fps=30)
 
 
-
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def get_images():
     try:
         image = camera.read()
@@ -113,7 +137,7 @@ def get_images():
         print(str(e))
     return image
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def preprocess(image, width, height):
     global device
     mean = torch.Tensor([0.485, 0.456, 0.406]).cuda()
@@ -126,17 +150,18 @@ def preprocess(image, width, height):
     image.sub_(mean[:, None, None]).div_(std[:, None, None])
     return image[None, ...]
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def inference(data):
     cmap, paf = model_trt(data)
+    torch.cuda.current_stream().synchronize()
     return cmap, paf
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def unwrap_to_tensors(cmap, paf):
     cmap_new, paf_new = cmap.detach().cpu(), paf.detach().cpu()
     return cmap_new, paf_new 
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def postprocess(image, cmap, paf):
     logging.debug('5.1. --- in ---')
     logging.debug('5.2. parse_objects()')
@@ -146,8 +171,14 @@ def postprocess(image, cmap, paf):
     logging.debug('5.4. --- return ---')
     return counts, objects, peaks, joints
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def create_json(joints, json_pose, json_hand):
+
+    dist_bn_joints = preprocessdata.find_distance(joints)
+    gesture = clf.predict([dist_bn_joints,[0]*num_parts*num_parts])
+    gesture_joints = gesture[0]
+    logging.debug(gesture_type[gesture_joints-1])
+
     new_pose = json_pose
     new_obj_hand = json_hand
     for i in range(len(joints)):
@@ -155,13 +186,14 @@ def create_json(joints, json_pose, json_hand):
         new_obj_hand['keypoints'][i]['y'] = joints[i][1]
     new_pose_obj = new_pose['objects']
     new_pose_obj.append(new_obj_hand)
+    new_pose['gesture'] = gesture_type[gesture_joints-1]
     return new_pose
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def send_json(socket, data):
     socket.send_json(data)
 
-@time_measure_utils.TimeMeasure.stop_watch
+@util_time_profiling.TimeIt.measure
 def loop_proc():
     # 画像取得
     logging.debug('1. image = get_images()')
@@ -195,5 +227,4 @@ def loop_proc():
 logging.info('   ###### LOOP ######')
 while True:
     loop_proc()
-    time_measure_utils.TimeMeasure.show_time_result(loop_proc)
-    time_measure_utils.TimeMeasure.reset_time_result()
+    util_time_profiling.TimeIt.show_result(loop_proc)
