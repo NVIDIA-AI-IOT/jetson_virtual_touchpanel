@@ -65,7 +65,7 @@ def about(self):
 def start(_):
     cmd = "x-terminal-emulator --title='handpose-camera service' -e \
         /home/jetson/jetson-pose-container/run.sh \
-        --run python3 ./_host_home/jetson_virtual_touchpanel/pub/trtpose_handpose/pub_hand_msg_profile.py \
+        --run python3 ./_host_home/jetson_virtual_touchpanel/pub/trtpose_handpose/pub_hand_msg_thread.py \
         ".split()
     subprocess.call(cmd)
 
