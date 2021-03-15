@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # PyTorch
-.pth
+*.pth
 
-.sav
+*.sav
