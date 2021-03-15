@@ -18,11 +18,12 @@ This tool is based on the following software.
 
 ## Software setup
 
-### Software dependencies
+### jetson_virtual_touchpanel
 
-We use [`jetson-pose-container`](https://github.com/NVIDIA-AI-IOT/jetson-pose-container) to run the trt_pose models for this tool (instrtuction in later seection).
+If not, clone this repo.<br>
+Make sure it's placed in the $HOME directory.
 
-We need following software on Jetson (docker host) to run the tool.
+We need following software on Jetson (docker host) to run this tool.
 
 ```
 sudo apt-get update
@@ -47,15 +48,28 @@ Save the following SVM model (for gesture classification) under `~/jetson_virtua
 
 > For training your own SVM model for custome gesture classification, check out the [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_data_collection_pose.ipynb) and [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_training/train_gesture_classification.ipynb) Jupyter notebooks in [`trt_pose_hand`] repo.
 
-### Install jetson-pose-container
+### Set up jetson-pose-container
 
 ```
 cd
 git clone https://github.com/tokk-nv/jetson-pose-container
 cd jetson-pose-container
 ./scripts/set_nvidia_runtime.sh
-./scripts/copy-jetson-ota-key.sh
-./build.sh
+```
+
+Also, make `docker` command available without using `sudo`.
+
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
+Reboot, and make sure you can just start the jeston-pose container without using `sudo`.
+
+```
+cd
+git clone https://github.com/tokk-nv/jetson-pose-container
+./run.sh
 ```
 
 ## How to use
