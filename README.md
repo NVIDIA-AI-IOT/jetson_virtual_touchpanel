@@ -75,7 +75,7 @@ cd jetson-pose-container
 ./run.sh
 ```
 
-It should pull the containier image from Docker Hub and once that is done it should launch into the terminal within the container.
+It should pull the container image from Docker Hub and once that is done it should launch into the terminal within the container.
 
 You can type `exit` to come out.
 
