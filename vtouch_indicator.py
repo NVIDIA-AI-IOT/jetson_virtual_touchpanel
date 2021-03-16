@@ -70,7 +70,8 @@ def start(_):
     subprocess.call(cmd)
 
 def stop(_):
-    cmd = "docker ps -a -q --filter ancestor=cyato/jetson-pose:r32.5.0"
+    #cmd = "docker ps -a -q --filter ancestor=jetson-pose"
+    cmd = "docker ps | grep 'jetson-pose' | awk '{print $1}'"
     container_id = subprocess.check_output(cmd, shell=True).decode("utf-8") 
     print(container_id)
     cmd = "docker stop " + container_id
