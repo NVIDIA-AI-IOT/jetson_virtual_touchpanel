@@ -118,7 +118,8 @@ The tool interprets the data and use `pynput` to contol the UI screen simulating
 
 ### How to end
 
-To stop the service, from the Virtual Touchpanel UI menu, select "Stop camera-pose service".
+To stop the service, from the Virtual Touchpanel UI menu, select "Stop camera-pose service".<br>
+It will take some time (~10sec) to stop the docker container.
 
 To shutdown the tool completely, select "Quit" from the Virtual Touchpanel UI menu.
 
