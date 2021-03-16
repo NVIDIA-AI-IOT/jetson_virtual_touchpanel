@@ -33,14 +33,17 @@ pip3 install pyzmq pynput
 
 ### Download models
 
-Save the following trt_pose model under `~/jetson_virtual_touchpanel/pub/model`.
+Currently, this tool needs two different models;
+
+- trt_pose model : For handpose detection. Below you can download the TRT optimized model for Jetson Xavier NX.
+- SVM model : For understanding the user's gesture
+
+Download the following two files and put them both under `~/jetson_virtual_touchpanel/pub/model`.
 
 | Model | Class | Trained with | Optimized for | Download | original |
 |-------|-------|--------------|---------------|----------|----------|
-| trt_pose model | `hand` | 2600 images | Jetson Xavier NX |  [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1ALFjVq8gfE0tcvtHuMpu0Qsi_oSRfkWw/view?usp=sharing) | [hand_pose_resnet18_baseline_att_224x224_A](https://drive.google.com/file/d/1NCVo0FiooWccDzY7hCc5MAKaoUpts3mo/view?usp=sharing)|
+| trt_pose model | `hand` | 2600 images | Jetson Xavier NX |  [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1ALFjVq8gfE0tcvtHuMpu0Qsi_oSRfkWw/view?usp=sharing) | hand_pose_resnet18_baseline_att_224x224_A|
 <!-- | trt_pose model | `hand` | 2600 images | Jetson Nano |  [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1rf4WJaFlFFgIfd7vcs-vTnGAnUBJje8g/view?usp=sharing) | [hand_pose_resnet18_baseline_att_224x224_A](https://drive.google.com/file/d/1NCVo0FiooWccDzY7hCc5MAKaoUpts3mo/view?usp=sharing)| -->
-
-Save the following SVM model (for gesture classification) under `~/jetson_virtual_touchpanel/pub/model`.
 
 | Model | Class | Trained with | Download |
 |--------|-----------------|----------------|--------|
@@ -129,4 +132,4 @@ To shutdown the tool completely, select "Quit" from the Virtual Touchpanel UI me
 
 - [ ] Support CSI camera (with exposure time control)
 - [ ] Optimize ZMQ message handling
-- [ ] Support various moniotr resolution and 
+- [ ] Support various monitor resolution and 
