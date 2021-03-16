@@ -35,10 +35,10 @@ pip3 install pyzmq pynput
 
 Save the following trt_pose model under `~/jetson_virtual_touchpanel/pub/model`.
 
-| Model | Class | Trained with | Download |
-|--------|-----------------|----------------|--------|
-| trt_pose model | `hand` | 2600 images | [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1ALFjVq8gfE0tcvtHuMpu0Qsi_oSRfkWw/view?usp=sharing) |
-
+| Model | Class | Trained with | Optimized for | Download | original |
+|-------|-------|--------------|---------------|----------|----------|
+| trt_pose model | `hand` | 2600 images | Jetson Xavier NX |  [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1ALFjVq8gfE0tcvtHuMpu0Qsi_oSRfkWw/view?usp=sharing) | [hand_pose_resnet18_baseline_att_224x224_A](https://drive.google.com/file/d/1NCVo0FiooWccDzY7hCc5MAKaoUpts3mo/view?usp=sharing)|
+<!-- | trt_pose model | `hand` | 2600 images | Jetson Nano |  [handpose_resnet18_att_224x224_nvhand-2k6_trt.pth](https://drive.google.com/file/d/1rf4WJaFlFFgIfd7vcs-vTnGAnUBJje8g/view?usp=sharing) | [hand_pose_resnet18_baseline_att_224x224_A](https://drive.google.com/file/d/1NCVo0FiooWccDzY7hCc5MAKaoUpts3mo/view?usp=sharing)| -->
 
 Save the following SVM model (for gesture classification) under `~/jetson_virtual_touchpanel/pub/model`.
 
@@ -80,16 +80,22 @@ git clone https://github.com/tokk-nv/jetson-pose-container
 
 > Make sure a device (like `/dev/video0`) is seen on your system. Depending on the device name (number), you need to edit the script (`pub/trtpose_handpose/pub_hand_msg_thread.py:L126`).
 
+- HDMI display
+
+> Connect an HDMI display and make sure the resolution is set to `1920x1080`.
+
 ### How to start
 
-Start the Jetson Virtual Touchpanel by invoking the indicator script.
+On the GUI desktop, open a terminal (`Ctrl` + `Alt` + `t`), then issue the following commands to invoke the indicator script.
+
 
 ```
 cd virtual_touchpanel
 python3 vtouch_indicator.py
 ```
 
-Then from its menu on the desktop top bar, select "Start camera-pose service".
+You will see a gray-out indicator icon in the desktop top panel bar.<br>
+Click on the icon, then select "Start camera-pose service".
 
 ![](/docs/images/vtouch_menu_start.png)
 
@@ -121,5 +127,6 @@ To shutdown the tool completely, select "Quit" from the Virtual Touchpanel UI me
 
 ## TODO
 
-- Support CSI camera (with exposure time control)
-- Optimize ZMQ message handling
+- [ ] Support CSI camera (with exposure time control)
+- [ ] Optimize ZMQ message handling
+- [ ] Support various moniotr resolution and 
