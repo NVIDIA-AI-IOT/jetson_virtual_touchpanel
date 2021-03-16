@@ -46,7 +46,7 @@ Save the following SVM model (for gesture classification) under `~/jetson_virtua
 |--------|-----------------|----------------|--------|
 | SVM model | `no-hand`, `pan`, `point`, `click`, `(other)` | 200 images | [svmmodel_5class.sav](https://drive.google.com/file/d/1AO-wU5ftYy6SEhoJurCMX5NKDW-0HF2Z/view?usp=sharing) |
 
-> For training your own SVM model for custome gesture classification, check out the [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_data_collection_pose.ipynb) and [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_training/train_gesture_classification.ipynb) Jupyter notebooks in [`trt_pose_hand`] repo.
+> For training your own SVM model for custome gesture classification, check out the [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_data_collection_pose.ipynb) and [gesture_data_collection_pose.ipynb](https://github.com/NVIDIA-AI-IOT/trt_pose_hand/blob/main/gesture_training/train_gesture_classification.ipynb) Jupyter notebooks in [`trt_pose_hand`](https://github.com/NVIDIA-AI-IOT/trt_pose_hand) repo.
 
 ### Set up jetson-pose-container
 
