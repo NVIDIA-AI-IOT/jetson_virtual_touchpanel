@@ -71,9 +71,13 @@ Reboot, and make sure you can just start the jeston-pose container without using
 
 ```
 cd
-git clone https://github.com/tokk-nv/jetson-pose-container
+cd jetson-pose-container
 ./run.sh
 ```
+
+It should pull the containier image from Docker Hub and once that is done it should launch into the terminal within the container.
+
+You can type `exit` to come out.
 
 ## How to use
 
